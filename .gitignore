@@ -1,0 +1,7 @@
+.idea
+.env
+frontend/build
+frontend/package-lock.json
+release
+frontend/node_modules
+*.iml
