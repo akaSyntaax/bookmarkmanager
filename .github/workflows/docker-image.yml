@@ -24,4 +24,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ github.actor }}/bookmarkmanager:latest
+        tags: akasyntaax/bookmarkmanager:latest
