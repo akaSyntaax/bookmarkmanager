@@ -119,19 +119,19 @@ func PostBookmark(c *gin.Context) {
 		return
 	}
 
-	insertedID, insertedIDErr := result.LastInsertId()
+	insertedID, _ := result.LastInsertId()
+	rowsAffected, _ := result.RowsAffected()
 
-	if insertedIDErr != nil {
-		HandleError(http.StatusInternalServerError, insertedIDErr, c)
-		return
+	if rowsAffected > 0 {
+		newBookmark, err := FetchBookmark(insertedID)
+
+		if err != nil {
+			HandleError(http.StatusInternalServerError, err, c)
+			return
+		}
+
+		c.JSON(http.StatusCreated, newBookmark)
+	} else {
+		c.JSON(http.StatusNotModified, gin.H{"error": "Bookmark could not be created."})
 	}
-
-	newBookmark, err := FetchBookmark(insertedID)
-
-	if err != nil {
-		HandleError(http.StatusInternalServerError, err, c)
-		return
-	}
-
-	c.JSON(http.StatusCreated, newBookmark)
 }
