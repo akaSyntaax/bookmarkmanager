@@ -24,4 +24,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: akasyntaax/bookmarkmanager:latest
+        tags: ghcr.io/akasyntaax/bookmarkmanager:latest
