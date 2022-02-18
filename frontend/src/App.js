@@ -1,4 +1,5 @@
-import {AppBar, Button, Container, Grid, Link, Toolbar, Typography} from '@mui/material';
+import {Alert, AppBar, Button, Container, Grid, Link, Snackbar, Toolbar, Typography} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {Component} from 'react';
 import {DataGrid} from '@mui/x-data-grid';
 import axios from 'axios';
@@ -6,6 +7,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmarks';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import AddBookmarkDialog from './AddBookmarkDialog';
 
 export default class App extends Component {
     constructor(props) {
@@ -37,21 +39,42 @@ export default class App extends Component {
                 },
             ],
             rows: [],
-            selectedRows: []
+            selectedRows: [],
+            deletePending: false,
+            refreshPending: false,
+            addPending: false,
+            addBookmarkDialogOpen: false,
+            errorSnackbarText: "",
+            errorSnackbarVisible: false,
+            errorSnackbarSeverity: "error"
         };
     }
 
     reloadDataGrid = () => {
+        this.setState({refreshPending: true});
+
         axios.get('/api/bookmarks').then(({data}) => {
             this.setState({rows: data});
+            this.setState({refreshPending: false});
         });
     };
 
-    deleteBookmarks = () => {
-        axios.delete('/api/bookmarks', {data: this.state.selectedRows}).then(() => {
-            this.reloadDataGrid();
-        });
-    }
+    deleteBookmarks = async () => {
+        if (this.state.selectedRows.length > 0) {
+            this.setState({deletePending: true});
+
+            try {
+                await axios.delete('/api/bookmarks', {data: this.state.selectedRows});
+                this.reloadDataGrid();
+                this.setState({errorSnackbarText: "The bookmarks have been deleted", errorSnackbarVisible: true, errorSnackbarSeverity: "success"});
+            } catch (e) {
+                console.error(e);
+                this.setState({errorSnackbarText: "An error occurred while deleting the bookmarks", errorSnackbarVisible: true, errorSnackbarSeverity: "error"});
+            }
+
+            this.setState({deletePending: false});
+        }
+    };
 
     handleCellEditCommit = (params) => {
         let updatedObject;
@@ -75,7 +98,24 @@ export default class App extends Component {
     };
 
     handleRowSelection = (gridSelectionModel) => {
-        this.setState({selectedRows: gridSelectionModel})
+        this.setState({selectedRows: gridSelectionModel});
+    };
+
+    handleBookmarkSaving = async (url, title) => {
+        this.setState({addPending: true, addBookmarkDialogOpen: false});
+
+        try {
+            await axios.post('/api/bookmarks', {url: url, title: title});
+            this.reloadDataGrid();
+            this.setState({errorSnackbarText: "The bookmark has been added", errorSnackbarVisible: true, errorSnackbarSeverity: "success"});
+            return true;
+        } catch (e) {
+            console.error(e);
+            this.setState({errorSnackbarText: "An error occurred while adding the bookmark", errorSnackbarVisible: true, errorSnackbarSeverity: "error"});
+            return false;
+        } finally {
+            this.setState({addPending: false});
+        }
     }
 
     componentDidMount() {
@@ -94,7 +134,7 @@ export default class App extends Component {
                         <Button color="inherit">Login</Button>
                     </Toolbar>
                 </AppBar>
-                <Container style={{marginTop: "90px"}}>
+                <Container style={{marginTop: '90px'}}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <DataGrid
@@ -109,11 +149,23 @@ export default class App extends Component {
                     </Grid>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <Button startIcon={<RefreshIcon/>} onClick={this.reloadDataGrid} variant="contained" style={{float: 'right', marginTop: '5px'}}>Refresh</Button>
-                            <Button color="error" startIcon={<DeleteIcon/>} onClick={this.deleteBookmarks} variant="contained" style={{float: 'right', marginTop: '5px', marginRight: '5px'}}>Delete</Button>
-                            <Button startIcon={<AddIcon/>} onClick={this.addBookmark} variant="contained" style={{float: 'right', marginTop: '5px', marginRight: '5px'}}>Add</Button>
+                            <LoadingButton loading={this.state.refreshPending} startIcon={<RefreshIcon/>} onClick={this.reloadDataGrid} variant="contained"
+                                           style={{float: 'right', marginTop: '5px'}}>Refresh</LoadingButton>
+                            <LoadingButton disabled={this.state.selectedRows.length === 0} loading={this.state.deletePending} color="error"
+                                           startIcon={<DeleteIcon/>} onClick={this.deleteBookmarks} variant="contained"
+                                           style={{float: 'right', marginTop: '5px', marginRight: '5px'}}>Delete</LoadingButton>
+                            <LoadingButton loading={this.state.addPending} startIcon={<AddIcon/>} onClick={() => this.setState({addBookmarkDialogOpen: true})}
+                                           variant="contained" style={{float: 'right', marginTop: '5px', marginRight: '5px'}}>Add</LoadingButton>
                         </Grid>
                     </Grid>
+
+                    <AddBookmarkDialog dialogOpen={this.state.addBookmarkDialogOpen} handleClose={() => this.setState({addBookmarkDialogOpen: false})} handleSave={this.handleBookmarkSaving}/>
+
+                    <Snackbar anchorOrigin={{vertical: 'top', horizontal: 'center'}} open={this.state.errorSnackbarVisible} autoHideDuration={6000} onClose={() => this.setState({errorSnackbarVisible: false})}>
+                        <Alert onClose={() => this.setState({errorSnackbarVisible: false})} severity={this.state.errorSnackbarSeverity} sx={{ width: '100%' }}>
+                            {this.state.errorSnackbarText}
+                        </Alert>
+                    </Snackbar>
                 </Container>
             </>
         );
