@@ -1,0 +1,22 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag akasyntaax/bookmarkmanager:latest
+    - name: Export the pat to match ghcr requirements
+      run: export CR_PAT=${{ secrets.GITHUB_TOKEN }}
+    - name: Login to ghcr
+      run: docker login ghcr.io -u akasyntaax
+    - name: Publish to ghcr
+      run: docker push ghcr.io/akasyntaax/bookmarkmanager:latest
