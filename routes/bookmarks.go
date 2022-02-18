@@ -9,7 +9,7 @@ import (
 )
 
 func FetchBookmarks() ([]models.Bookmark, error) {
-	var bookmarks []models.Bookmark
+	bookmarks := []models.Bookmark{}
 
 	rows, err := DBClient.Query("SELECT * FROM Bookmarks")
 
@@ -55,7 +55,7 @@ func GetBookmarks(c *gin.Context) {
 
 func DeleteBookmarks(c *gin.Context) {
 	var bookmarksToDelete []int64
-	var deletedBookmarks []int64
+	deletedBookmarks := []int64{}
 
 	if err := c.BindJSON(&bookmarksToDelete); err != nil {
 		HandleError(http.StatusBadRequest, err, c)
