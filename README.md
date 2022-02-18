@@ -48,7 +48,7 @@ This project is created using the following awesome languages and frameworks
 
 ### Building and running the docker image
 1. Execute `sudo docker build https://github.com/akaSyntaax/bookmarkmanager.git\#:. -t akasyntaax/bookmarkmanager:latest` to build the image
-2. You can then run the image by executing `sudo docker run --name bookmarkmanager -v /path/to/your/data/:/data -p 8000:8000 akasyntaax/bookmarkmanager:latest`
+2. You can then run the image by executing `sudo docker run -d --name bookmarkmanager -v /path/to/your/data/:/data -p 8000:8000 akasyntaax/bookmarkmanager:latest`
 3. The app is now accessible at http://your-ip:8000
 
 ### Running the binary
