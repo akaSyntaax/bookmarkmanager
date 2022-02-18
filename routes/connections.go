@@ -2,29 +2,63 @@ package routes
 
 import (
 	"database/sql"
-	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/joho/godotenv/autoload"
 	"log"
+	_ "modernc.org/sqlite"
 	"os"
 )
 
-func DBInstance() *sql.DB {
-	sqlConnectionString := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
-	db, err := sql.Open("mysql", sqlConnectionString)
-	//defer db.Close() Close connection outside of this method
+func DBConnection() *sql.DB {
+	connection, err := sql.Open("sqlite", os.Getenv("DB_PATH"))
 
 	if err != nil {
 		log.Fatal("Could not connect to the database: " + err.Error())
 	}
 
-	return db
+	return connection
 }
 
-var DBClient = DBInstance()
+func InitializeDatabase() {
+	_, _, createErr := ExecuteNonQuery("CREATE TABLE IF NOT EXISTS Bookmarks (ID integer primary key not null, Title varchar(64) null, URL varchar(256) not null, Created timestamp default current_timestamp not null)")
+
+	if createErr != nil {
+		log.Fatal("Could not initialize database: " + createErr.Error())
+	}
+}
+
+var DBClient = DBConnection()
 
 func ExecuteStringQuery(query string) (string, error) {
 	var output string
 	err := DBClient.QueryRow(query).Scan(&output)
 	return output, err
+}
+
+func ExecuteNonQuery(query string, args ...interface{}) (int64, int64, error) {
+	var result sql.Result
+	var err error
+
+	if len(args) > 0 {
+		result, err = DBClient.Exec(query, args)
+	} else {
+		result, err = DBClient.Exec(query)
+	}
+
+	if err != nil {
+		return -1, -1, err
+	}
+
+	affectedRows, err := result.RowsAffected()
+
+	if err != nil {
+		return -1, -1, err
+	}
+
+	lastInsertID, err := result.LastInsertId()
+
+	if err != nil {
+		return -1, -1, err
+	}
+
+	return affectedRows, lastInsertID, err
 }

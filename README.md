@@ -55,13 +55,9 @@ Just pick your os and architecture, download the archive and extract it to your 
 2. Unpack the archive to your preferred location
 3. Create a file named `.env` in the same folder the binary is located and paste in the following:
 ```
-PORT=8000  
-DB_USER=<database_username>  
-DB_PASSWORD=<database_password>  
-DB_NAME=<database_name>  
-DB_HOST=127.0.0.1  
-DB_PORT=3306  
-TRUSTED_PROXIES=127.0.0.1,::1  
+PORT=8000
+DB_PATH=./database.sqlite3
+TRUSTED_PROXIES=127.0.0.1,::1
 MODE=RELEASE
 ```
 4. You can now execute the binary and access the ui at http://127.0.0.1:8000
@@ -93,7 +89,7 @@ You need to have an installation of NodeJS (with npm) and Go. I used NodeJS 16 a
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Add sqlite as storage option
+- [x] Use sqlite instead of mysql as data storage
 - [ ] Create docker images
 - [ ] Create browser extensions/bookmarklets
 - [ ] Add options to create bookmarks using the ui
