@@ -3,6 +3,9 @@ import {Component} from 'react';
 import {DataGrid} from '@mui/x-data-grid';
 import axios from 'axios';
 import BookmarkIcon from '@mui/icons-material/Bookmarks';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 
 export default class App extends Component {
     constructor(props) {
@@ -33,7 +36,8 @@ export default class App extends Component {
                     renderCell: (params) => <Link underline="none" target="_blank" href={params.row.url}>{params.row.url}</Link>
                 },
             ],
-            rows: []
+            rows: [],
+            selectedRows: []
         };
     }
 
@@ -42,6 +46,12 @@ export default class App extends Component {
             this.setState({rows: data});
         });
     };
+
+    deleteBookmarks = () => {
+        axios.delete('/api/bookmarks', {data: this.state.selectedRows}).then(() => {
+            this.reloadDataGrid();
+        });
+    }
 
     handleCellEditCommit = (params) => {
         let updatedObject;
@@ -63,6 +73,10 @@ export default class App extends Component {
             this.reloadDataGrid();
         });
     };
+
+    handleRowSelection = (gridSelectionModel) => {
+        this.setState({selectedRows: gridSelectionModel})
+    }
 
     componentDidMount() {
         this.reloadDataGrid();
@@ -89,12 +103,15 @@ export default class App extends Component {
                                 onCellEditCommit={this.handleCellEditCommit}
                                 checkboxSelection
                                 autoHeight
+                                onSelectionModelChange={this.handleRowSelection}
                             />
                         </Grid>
                     </Grid>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <Button onClick={this.reloadDataGrid} variant="contained" style={{float: 'right', marginTop: '5px'}}>Reload</Button>
+                            <Button startIcon={<RefreshIcon/>} onClick={this.reloadDataGrid} variant="contained" style={{float: 'right', marginTop: '5px'}}>Refresh</Button>
+                            <Button color="error" startIcon={<DeleteIcon/>} onClick={this.deleteBookmarks} variant="contained" style={{float: 'right', marginTop: '5px', marginRight: '5px'}}>Delete</Button>
+                            <Button startIcon={<AddIcon/>} onClick={this.addBookmark} variant="contained" style={{float: 'right', marginTop: '5px', marginRight: '5px'}}>Add</Button>
                         </Grid>
                     </Grid>
                 </Container>
