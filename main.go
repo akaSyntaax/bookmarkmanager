@@ -44,6 +44,7 @@ func main() {
 		api.GET("/diagnostics", routes.GetDiagnostics)
 		api.GET("/bookmarks", routes.GetBookmarks)
 		api.POST("/bookmarks", routes.PostBookmark)
+		api.DELETE("/bookmarks", routes.DeleteBookmarks)
 	}
 
 	fmt.Println("Startup completed.")

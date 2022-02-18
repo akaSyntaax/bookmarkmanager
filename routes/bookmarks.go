@@ -53,6 +53,49 @@ func GetBookmarks(c *gin.Context) {
 	c.JSON(http.StatusOK, bookmarks)
 }
 
+func DeleteBookmarks(c *gin.Context) {
+	var bookmarksToDelete []int64
+	var deletedBookmarks []int64
+
+	if err := c.BindJSON(&bookmarksToDelete); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
+		return
+	}
+
+	var deleteError error
+
+	for _, bookmarkID := range bookmarksToDelete {
+		if !contains(deletedBookmarks, bookmarkID) {
+			if result, err := DBClient.Exec("DELETE FROM Bookmarks WHERE ID = ?", bookmarkID); err == nil {
+				if affectedRows, _ := result.RowsAffected(); affectedRows > 0 {
+					deletedBookmarks = append(deletedBookmarks, bookmarkID)
+				}
+			} else {
+				deleteError = err
+				break
+			}
+		}
+	}
+
+	if deleteError == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"deleted_bookmarks": deletedBookmarks,
+		})
+	} else {
+		HandleError(http.StatusInternalServerError, deleteError, c)
+	}
+}
+
+func contains(s []int64, e int64) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+
+	return false
+}
+
 func PostBookmark(c *gin.Context) {
 	var bookmark models.Bookmark
 
