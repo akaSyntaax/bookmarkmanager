@@ -46,10 +46,14 @@ This project is created using the following awesome languages and frameworks
 <!-- GETTING STARTED -->
 ## Getting Started
 
-### Installation
+### Building and running the docker image
+1. Execute `sudo docker build https://github.com/akaSyntaax/bookmarkmanager.git\#:. -t akasyntaax/bookmarkmanager:latest` to build the image
+2. You can then run the image by executing `sudo docker run --name bookmarkmanager -v /path/to/your/data/:/data -p 8000:8000 akasyntaax/bookmarkmanager:latest`
+3. The app is now accessible at http://<your-ip>:8000
+
+### Running the binary
 
 I publish binaries for several operating systems and architectures on the [release page](https://github.com/akasyntaax/bookmarkmanager/releases).
-Just pick your os and architecture, download the archive and extract it to your preferred path.
 
 1. Download the binary matching your os and architecture from the [release page](https://github.com/akasyntaax/bookmarkmanager/releases)
 2. Unpack the archive to your preferred location
@@ -60,7 +64,7 @@ DB_PATH=./database.sqlite3
 TRUSTED_PROXIES=127.0.0.1,::1
 MODE=RELEASE
 ```
-4. You can now execute the binary and access the ui at http://127.0.0.1:8000
+4. You can now execute the binary and access the ui at http://<your-ip>:8000
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -92,7 +96,7 @@ You need to have an installation of NodeJS (with npm) and Go. I used NodeJS 16 a
 - [x] Use sqlite instead of mysql as data storage
 - [ ] Create docker images
 - [ ] Create browser extensions/bookmarklets
-- [ ] Add options to create bookmarks using the ui
+- [x] Add options to create bookmarks using the ui
 - [ ] Add per user bookmarks/registration
 - [ ] Create Android and iOS apps
 - [ ] Multi-language Support
