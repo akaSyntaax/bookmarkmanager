@@ -47,6 +47,8 @@ func main() {
 		api.DELETE("/bookmarks", routes.DeleteBookmarks)
 	}
 
+	routes.InitializeDatabase()
+
 	fmt.Println("Startup completed.")
 	router.Run()
 }
