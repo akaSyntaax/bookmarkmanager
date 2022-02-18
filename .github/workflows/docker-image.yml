@@ -17,6 +17,6 @@ jobs:
     - name: Export the pat to match ghcr requirements
       run: export CR_PAT=${{ secrets.GITHUB_TOKEN }}
     - name: Login to ghcr
-      run: docker login ghcr.io -u akasyntaax
+      run: echo $CR_PAT | docker login ghcr.io -u akasyntaax --password-stdin
     - name: Publish to ghcr
       run: docker push ghcr.io/akasyntaax/bookmarkmanager:latest
