@@ -1,11 +1,14 @@
 <div id="top"></div>
 <!-- PROJECT SHIELDS -->
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/akasyntaax/bookmarkmanager/Build%20a%20release%20executable?label=build%20executables&style=flat-square)](https://github.com/akaSyntaax/bookmarkmanager/actions/workflows/build.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/akasyntaax/bookmarkmanager/Docker%20Image%20CI?label=build%20docker%20image&style=flat-square)](https://github.com/akaSyntaax/bookmarkmanager/actions/workflows/docker-image.yml)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/akasyntaax/bookmarkmanager?style=flat-square)
+[![Contributors](https://img.shields.io/github/contributors/akaSyntaax/bookmarkmanager.svg?style=flat-square)](https://github.com/akaSyntaax/bookmarkmanager/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/akaSyntaax/bookmarkmanager.svg?style=flat-square)](https://github.com/akaSyntaax/bookmarkmanager/network/members)
+[![Stargazers](https://img.shields.io/github/stars/akaSyntaax/bookmarkmanager.svg?style=flat-square)](https://github.com/akaSyntaax/bookmarkmanager/stargazers)
+[![Issues](https://img.shields.io/github/issues/akaSyntaax/bookmarkmanager.svg?style=flat-square)](https://github.com/akaSyntaax/bookmarkmanager/issues)
+[![MIT License](https://img.shields.io/github/license/akaSyntaax/bookmarkmanager.svg?style=flat-square)](https://github.com/akaSyntaax/bookmarkmanager/blob/master/LICENSE.txt)
 
 <br />
 <div align="center">
@@ -46,10 +49,15 @@ This project is created using the following awesome languages and frameworks
 <!-- GETTING STARTED -->
 ## Getting Started
 
-### Installation
+### Running the docker image
+There are images for amd64, arm64 (aarch64), armv7 and armv6 built and published to the GitHub container registry.
+
+1. You can run the image by executing `sudo docker run -d --name bookmarkmanager -v /path/to/your/data/:/data -p 8000:8000 ghcr.io/akasyntaax/bookmarkmanager:latest`
+3. The app is now accessible at http://your-ip:8000
+
+### Running the binary
 
 I publish binaries for several operating systems and architectures on the [release page](https://github.com/akasyntaax/bookmarkmanager/releases).
-Just pick your os and architecture, download the archive and extract it to your preferred path.
 
 1. Download the binary matching your os and architecture from the [release page](https://github.com/akasyntaax/bookmarkmanager/releases)
 2. Unpack the archive to your preferred location
@@ -60,7 +68,7 @@ DB_PATH=./database.sqlite3
 TRUSTED_PROXIES=127.0.0.1,::1
 MODE=RELEASE
 ```
-4. You can now execute the binary and access the ui at http://127.0.0.1:8000
+4. You can now execute the binary and access the ui at http://your-ip:8000
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -83,6 +91,13 @@ You need to have an installation of NodeJS (with npm) and Go. I used NodeJS 16 a
 5. To compile the frontend, cd into the folder `frontend` and run `npm run build`
 6. After building the frontend, you can build the backend by running `go build .` in the projects root folder
 
+### Building the docker image
+
+1. Clone the repository to your preferred location and `cd` into it
+2. Execute `sudo docker build . -t akasyntaax/bookmarkmanager:latest` to build the image
+3. You can then run the image by executing `sudo docker run -d --name bookmarkmanager -v /path/to/your/data/:/data -p 8000:8000 akasyntaax/bookmarkmanager:latest`
+4. The app is now accessible at http://your-ip:8000
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
@@ -90,9 +105,9 @@ You need to have an installation of NodeJS (with npm) and Go. I used NodeJS 16 a
 ## Roadmap
 
 - [x] Use sqlite instead of mysql as data storage
-- [ ] Create docker images
+- [x] Create docker images
 - [ ] Create browser extensions/bookmarklets
-- [ ] Add options to create bookmarks using the ui
+- [x] Implement bookmark creation using the frontend
 - [ ] Add per user bookmarks/registration
 - [ ] Create Android and iOS apps
 - [ ] Multi-language Support
@@ -150,18 +165,3 @@ These great libraries and tools also made my life a lot easier
 * [JetBrains GoLand](https://www.jetbrains.com/go/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/akaSyntaax/bookmarkmanager.svg?style=for-the-badge
-[contributors-url]: https://github.com/akaSyntaax/bookmarkmanager/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/akaSyntaax/bookmarkmanager.svg?style=for-the-badge
-[forks-url]: https://github.com/akaSyntaax/bookmarkmanager/network/members
-[stars-shield]: https://img.shields.io/github/stars/akaSyntaax/bookmarkmanager.svg?style=for-the-badge
-[stars-url]: https://github.com/akaSyntaax/bookmarkmanager/stargazers
-[issues-shield]: https://img.shields.io/github/issues/akaSyntaax/bookmarkmanager.svg?style=for-the-badge
-[issues-url]: https://github.com/akaSyntaax/bookmarkmanager/issues
-[license-shield]: https://img.shields.io/github/license/akaSyntaax/bookmarkmanager.svg?style=for-the-badge
-[license-url]: https://github.com/akaSyntaax/bookmarkmanager/blob/master/LICENSE.txt
