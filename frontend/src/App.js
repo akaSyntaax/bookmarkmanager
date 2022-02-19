@@ -76,7 +76,7 @@ export default class App extends Component {
         }
     };
 
-    handleCellEditCommit = (params) => {
+    handleCellEditCommit = async (params) => {
         let updatedObject;
 
         this.state.rows.forEach(row => {
@@ -87,14 +87,16 @@ export default class App extends Component {
 
         updatedObject[params.field] = params.value;
 
-        axios.put('/api/bookmarks/' + updatedObject.id, {
-            id: updatedObject.id,
-            title: updatedObject.title,
-            url: updatedObject.url
-        }).then(({data}) => {
-            this.setState({rows: data});
-            this.reloadDataGrid();
-        });
+        try {
+            await axios.patch('/api/bookmarks/' + updatedObject.id, {
+                title: updatedObject.title,
+                url: updatedObject.url
+            });
+
+            this.setState({errorSnackbarText: "The bookmark has been updated", errorSnackbarVisible: true, errorSnackbarSeverity: "success"});
+        } catch (e) {
+            this.setState({errorSnackbarText: "An error occurred while updating the bookmark", errorSnackbarVisible: true, errorSnackbarSeverity: "error"});
+        }
     };
 
     handleRowSelection = (gridSelectionModel) => {

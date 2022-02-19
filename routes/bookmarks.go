@@ -3,9 +3,11 @@ package routes
 import (
 	"BookmarkManager/models"
 	"database/sql"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"net/http"
 )
 
 func FetchBookmarks() ([]models.Bookmark, error) {
@@ -86,6 +88,55 @@ func DeleteBookmarks(c *gin.Context) {
 	}
 }
 
+func UpdateBookmark(c *gin.Context) {
+	targetBookmarkID, converr := strconv.Atoi(c.Param("id"))
+
+	if converr != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid bookmark id"})
+		return
+	}
+
+	targetBookmark, fetcherr := FetchBookmark(int64(targetBookmarkID))
+
+	if fetcherr != nil {
+		HandleError(http.StatusInternalServerError, fetcherr, c)
+		return
+	}
+
+	var updatedBookmark models.Bookmark
+
+	if err := c.BindJSON(&updatedBookmark); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
+		return
+	}
+
+	validate := validator.New()
+	validationErr := validate.Struct(updatedBookmark)
+
+	if validationErr != nil {
+		HandleError(http.StatusBadRequest, validationErr, c)
+		return
+	}
+
+	updatedBookmark.ID = targetBookmark.ID
+	updatedBookmark.Created = targetBookmark.Created
+
+	result, err := DBClient.Exec("UPDATE Bookmarks SET Title = ?, URL = ? WHERE ID = ?", updatedBookmark.Title, updatedBookmark.URL, updatedBookmark.ID)
+
+	if err != nil {
+		HandleError(http.StatusInternalServerError, err, c)
+		return
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+
+	if rowsAffected > 0 {
+		c.JSON(http.StatusOK, updatedBookmark)
+	} else {
+		c.JSON(http.StatusNotModified, gin.H{"error": "Bookmark could not be updated"})
+	}
+}
+
 func contains(s []int64, e int64) bool {
 	for _, a := range s {
 		if a == e {
@@ -132,6 +183,6 @@ func PostBookmark(c *gin.Context) {
 
 		c.JSON(http.StatusCreated, newBookmark)
 	} else {
-		c.JSON(http.StatusNotModified, gin.H{"error": "Bookmark could not be created."})
+		c.JSON(http.StatusNotModified, gin.H{"error": "Bookmark could not be created"})
 	}
 }
