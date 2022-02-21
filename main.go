@@ -4,16 +4,15 @@ import (
 	"BookmarkManager/routes"
 	"embed"
 	"fmt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"strings"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	_ "github.com/joho/godotenv/autoload"
 )
 
 //go:embed frontend/build/*

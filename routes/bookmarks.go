@@ -3,11 +3,10 @@ package routes
 import (
 	"BookmarkManager/models"
 	"database/sql"
-	"net/http"
-	"strconv"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"net/http"
+	"strconv"
 )
 
 func FetchBookmarks() ([]models.Bookmark, error) {
@@ -96,13 +95,6 @@ func UpdateBookmark(c *gin.Context) {
 		return
 	}
 
-	targetBookmark, fetcherr := FetchBookmark(int64(targetBookmarkID))
-
-	if fetcherr != nil {
-		HandleError(http.StatusInternalServerError, fetcherr, c)
-		return
-	}
-
 	var updatedBookmark models.Bookmark
 
 	if err := c.BindJSON(&updatedBookmark); err != nil {
@@ -118,10 +110,20 @@ func UpdateBookmark(c *gin.Context) {
 		return
 	}
 
-	updatedBookmark.ID = targetBookmark.ID
-	updatedBookmark.Created = targetBookmark.Created
+	targetBookmark, fetcherr := FetchBookmark(int64(targetBookmarkID))
 
-	result, err := DBClient.Exec("UPDATE Bookmarks SET Title = ?, URL = ? WHERE ID = ?", updatedBookmark.Title, updatedBookmark.URL, updatedBookmark.ID)
+	if fetcherr != nil {
+		HandleError(http.StatusInternalServerError, fetcherr, c)
+		return
+	}
+
+	// Bookmark.ID == 0 means the bookmark does not exist (int's default value is zero)
+	if targetBookmark.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Bookmark does not exist"})
+		return
+	}
+
+	result, err := DBClient.Exec("UPDATE Bookmarks SET Title = ?, URL = ? WHERE ID = ?", updatedBookmark.Title, updatedBookmark.URL, targetBookmarkID)
 
 	if err != nil {
 		HandleError(http.StatusInternalServerError, err, c)
