@@ -3,6 +3,7 @@ package routes
 import (
 	"BookmarkManager/models"
 	"database/sql"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"
@@ -91,7 +92,7 @@ func UpdateBookmark(c *gin.Context) {
 	targetBookmarkID, converr := strconv.ParseUint(c.Param("id"), 10, 32)
 
 	if converr != nil || targetBookmarkID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid bookmark id"})
+		HandleError(http.StatusBadRequest, errors.New("bookmark id is invalid"), c)
 		return
 	}
 
@@ -119,7 +120,7 @@ func UpdateBookmark(c *gin.Context) {
 
 	// Bookmark.ID == 0 means the bookmark does not exist (int's default value is zero)
 	if targetBookmark.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Bookmark does not exist"})
+		HandleError(http.StatusNotFound, errors.New("bookmark does not exist"), c)
 		return
 	}
 
@@ -138,7 +139,7 @@ func UpdateBookmark(c *gin.Context) {
 	if rowsAffected > 0 {
 		c.JSON(http.StatusOK, updatedBookmark)
 	} else {
-		c.JSON(http.StatusNotModified, gin.H{"error": "Bookmark could not be updated"})
+		HandleError(http.StatusNotModified, errors.New("bookmark could not be updated"), c)
 	}
 }
 
@@ -188,6 +189,6 @@ func PostBookmark(c *gin.Context) {
 
 		c.JSON(http.StatusCreated, newBookmark)
 	} else {
-		c.JSON(http.StatusNotModified, gin.H{"error": "Bookmark could not be created"})
+		HandleError(http.StatusNotModified, errors.New("bookmark could not be created"), c)
 	}
 }
