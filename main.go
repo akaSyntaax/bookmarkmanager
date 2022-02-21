@@ -8,6 +8,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -45,8 +46,6 @@ func main() {
 		log.Fatal("Could not setup trusted proxies: " + err.Error())
 	}
 
-	router.Use(ServeEmbedFS("frontend/build", reactStatic))
-
 	api := router.Group("/api")
 	{
 		api.POST("/users/login", routes.Login)
@@ -66,6 +65,8 @@ func main() {
 		api.DELETE("/bookmarks", routes.DeleteBookmarks)
 		api.PATCH("/bookmarks/:id", routes.UpdateBookmark)
 	}
+
+	router.Use(ServeEmbedFS("frontend/build", reactStatic))
 
 	routes.InitializeDatabase()
 
@@ -135,6 +136,18 @@ func ServeEmbedFS(fileRoot string, embedFS embed.FS) gin.HandlerFunc {
 
 			// Prevent other handlers from being run
 			c.Abort()
+		} else {
+			f, err := subFS.Open("index.html")
+			defer f.Close()
+
+			if err != nil {
+				routes.HandleError(http.StatusInternalServerError, err, c)
+				return
+			}
+
+			stat, _ := f.Stat()
+
+			http.ServeContent(c.Writer, c.Request, stat.Name(), stat.ModTime(), f.(io.ReadSeeker))
 		}
 	}
 }
