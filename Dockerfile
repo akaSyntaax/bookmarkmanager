@@ -17,6 +17,7 @@ ENV DB_PATH=/data/database.sqlite
 ENV MODE=RELEASE
 ENV PORT=8000
 ENV TRUSTED_PROXIES=0.0.0.0
+ENV REGISTRATIONS_ENABLED=true
 WORKDIR /app
 COPY --from=go-builder /src/bookmarkmanager ./
 CMD ["./bookmarkmanager"]

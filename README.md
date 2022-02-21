@@ -52,7 +52,7 @@ This project is created using the following awesome languages and frameworks
 ### Running the docker image
 There are images for amd64, arm64 (aarch64), armv7 and armv6 built and published to the GitHub container registry.
 
-1. You can run the image by executing `sudo docker run -d --name bookmarkmanager -v /path/to/your/data/:/data -p 8000:8000 ghcr.io/akasyntaax/bookmarkmanager:latest`
+1. You can run the image by executing `sudo docker run -d --name bookmarkmanager -e JWT_SECRET=Your32CharactersJSONWebTokensKey -v /path/to/your/data/:/data -p 8000:8000 ghcr.io/akasyntaax/bookmarkmanager:latest`
 3. The app is now accessible at http://your-ip:8000
 
 ### Running the binary
@@ -67,6 +67,8 @@ PORT=8000
 DB_PATH=./database.sqlite3
 TRUSTED_PROXIES=127.0.0.1,::1
 MODE=RELEASE
+JWT_SECRET=Your32CharactersJSONWebTokensKey
+REGISTRATIONS_ENABLED=true
 ```
 4. You can now execute the binary and access the ui at http://your-ip:8000
 

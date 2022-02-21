@@ -10,10 +10,10 @@ import (
 	"strconv"
 )
 
-func FetchBookmarks() ([]models.Bookmark, error) {
+func FetchBookmarks(user models.User) ([]models.Bookmark, error) {
 	bookmarks := []models.Bookmark{}
 
-	rows, err := DBClient.Query("SELECT * FROM Bookmarks")
+	rows, err := DBClient.Query("SELECT * FROM Bookmarks WHERE UserID = ?", user.ID)
 
 	if err != nil {
 		return bookmarks, err
@@ -22,7 +22,7 @@ func FetchBookmarks() ([]models.Bookmark, error) {
 	for rows.Next() {
 		var bookmark models.Bookmark
 
-		if err := rows.Scan(&bookmark.ID, &bookmark.Title, &bookmark.URL, &bookmark.Created); err != nil {
+		if err := rows.Scan(&bookmark.ID, &bookmark.Title, &bookmark.URL, &bookmark.Created, &bookmark.UserID); err != nil {
 			return bookmarks, err
 		}
 
@@ -32,12 +32,12 @@ func FetchBookmarks() ([]models.Bookmark, error) {
 	return bookmarks, nil
 }
 
-func FetchBookmark(id uint32) (models.Bookmark, error) {
+func FetchBookmark(bookmarkID uint32, user models.User) (models.Bookmark, error) {
 	var bookmark models.Bookmark
 
-	row := DBClient.QueryRow("SELECT * FROM Bookmarks WHERE ID = ? LIMIT 1", id)
+	row := DBClient.QueryRow("SELECT * FROM Bookmarks WHERE ID = ? AND UserID = ? LIMIT 1", bookmarkID, user.ID)
 
-	if err := row.Scan(&bookmark.ID, &bookmark.Title, &bookmark.URL, &bookmark.Created); err != nil && err != sql.ErrNoRows {
+	if err := row.Scan(&bookmark.ID, &bookmark.Title, &bookmark.URL, &bookmark.Created, &bookmark.UserID); err != nil && err != sql.ErrNoRows {
 		return bookmark, err
 	}
 
@@ -45,7 +45,8 @@ func FetchBookmark(id uint32) (models.Bookmark, error) {
 }
 
 func GetBookmarks(c *gin.Context) {
-	bookmarks, err := FetchBookmarks()
+	user, _ := c.Get("user")
+	bookmarks, err := FetchBookmarks(user.(models.User))
 
 	if err != nil {
 		HandleError(http.StatusInternalServerError, err, c)
@@ -64,11 +65,12 @@ func DeleteBookmarks(c *gin.Context) {
 		return
 	}
 
+	user, _ := c.Get("user")
 	var deleteError error
 
 	for _, bookmarkID := range bookmarksToDelete {
 		if !contains(deletedBookmarks, bookmarkID) {
-			if result, err := DBClient.Exec("DELETE FROM Bookmarks WHERE ID = ?", bookmarkID); err == nil {
+			if result, err := DBClient.Exec("DELETE FROM Bookmarks WHERE ID = ? AND UserID = ?", bookmarkID, user.(models.User).ID); err == nil {
 				if affectedRows, _ := result.RowsAffected(); affectedRows > 0 {
 					deletedBookmarks = append(deletedBookmarks, bookmarkID)
 				}
@@ -111,7 +113,9 @@ func UpdateBookmark(c *gin.Context) {
 		return
 	}
 
-	targetBookmark, fetcherr := FetchBookmark(uint32(targetBookmarkID))
+	user, _ := c.Get("user")
+
+	targetBookmark, fetcherr := FetchBookmark(uint32(targetBookmarkID), user.(models.User))
 
 	if fetcherr != nil {
 		HandleError(http.StatusInternalServerError, fetcherr, c)
@@ -127,7 +131,7 @@ func UpdateBookmark(c *gin.Context) {
 	updatedBookmark.ID = uint32(targetBookmarkID)
 	updatedBookmark.Created = targetBookmark.Created
 
-	result, err := DBClient.Exec("UPDATE Bookmarks SET Title = ?, URL = ? WHERE ID = ?", updatedBookmark.Title, updatedBookmark.URL, targetBookmarkID)
+	result, err := DBClient.Exec("UPDATE Bookmarks SET Title = ?, URL = ? WHERE ID = ? AND UserID = ?", updatedBookmark.Title, updatedBookmark.URL, targetBookmarkID, user.(models.User).ID)
 
 	if err != nil {
 		HandleError(http.StatusInternalServerError, err, c)
@@ -169,7 +173,8 @@ func PostBookmark(c *gin.Context) {
 		return
 	}
 
-	result, err := DBClient.Exec("INSERT INTO Bookmarks(Title, URL) VALUES(?, ?)", bookmark.Title, bookmark.URL)
+	user, _ := c.Get("user")
+	result, err := DBClient.Exec("INSERT INTO Bookmarks(Title, URL, UserID) VALUES(?, ?, ?)", bookmark.Title, bookmark.URL, user.(models.User).ID)
 
 	if err != nil {
 		HandleError(http.StatusInternalServerError, err, c)
@@ -180,7 +185,7 @@ func PostBookmark(c *gin.Context) {
 	rowsAffected, _ := result.RowsAffected()
 
 	if rowsAffected > 0 {
-		newBookmark, err := FetchBookmark(uint32(insertedID))
+		newBookmark, err := FetchBookmark(uint32(insertedID), user.(models.User))
 
 		if err != nil {
 			HandleError(http.StatusInternalServerError, err, c)

@@ -10,4 +10,5 @@ type Bookmark struct {
 	Title   null.String `json:"title" validate:"min=1,max=64"`
 	URL     string      `json:"url" validate:"required,max=256,url"`
 	Created time.Time   `json:"created"`
+	UserID  uint32      `json:"userid"`
 }

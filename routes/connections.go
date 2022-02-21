@@ -21,9 +21,15 @@ func DBConnection() *sql.DB {
 func InitializeDatabase() {
 	_, _, createErr := ExecuteNonQuery("CREATE TABLE IF NOT EXISTS Bookmarks (ID integer primary key not null, Title varchar(64) null, URL varchar(256) not null, Created timestamp default current_timestamp not null)")
 
-	if createErr != nil {
-		log.Fatal("Could not initialize database: " + createErr.Error())
+	if createErr == nil {
+		_, _, createErr := ExecuteNonQuery("CREATE TABLE IF NOT EXISTS Users (ID integer primary key not null, Username varchar(32) not null, PasswordHash varchar(1024) not null, Created timestamp default current_timestamp not null, UserID integer not null references Users on update restrict on delete cascade)")
+
+		if createErr == nil {
+			return
+		}
 	}
+
+	log.Fatal("Could not initialize database: " + createErr.Error())
 }
 
 var DBClient = DBConnection()
