@@ -148,6 +148,7 @@ func ServeEmbedFS(fileRoot string, embedFS embed.FS) gin.HandlerFunc {
 			stat, _ := f.Stat()
 
 			http.ServeContent(c.Writer, c.Request, stat.Name(), stat.ModTime(), f.(io.ReadSeeker))
+			c.Abort()
 		}
 	}
 }
