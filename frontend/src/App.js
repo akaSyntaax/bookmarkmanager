@@ -7,6 +7,7 @@ import MenuBar from './components/MenuBar';
 import {Container} from '@mui/material';
 import AuthenticatedRoute from './components/AuthenticatedRoute';
 import UnauthenticatedRoute from './components/UnauthenticatedRoute';
+import NotFoundRoute from './routes/NotFoundRoute';
 
 export default class App extends Component {
     render() {
@@ -14,6 +15,7 @@ export default class App extends Component {
             <>
                 <Container style={{marginTop: '90px'}}>
                     <Routes>
+                        <Route path="*" element={<><MenuBar route="register"/><NotFoundRoute/></>}/>
                         <Route path="/" element={<AuthenticatedRoute><MenuBar/><MainRoute/></AuthenticatedRoute>}/>
                         <Route path="/login" element={<UnauthenticatedRoute><MenuBar route="login"/><LoginRoute/></UnauthenticatedRoute>}/>
                         <Route path="/register" element={<UnauthenticatedRoute><MenuBar route="register"/><RegisterRoute/></UnauthenticatedRoute>}/>

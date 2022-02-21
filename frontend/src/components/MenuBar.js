@@ -1,5 +1,5 @@
 import {Component} from 'react';
-import {AppBar, Button, Toolbar, Typography} from '@mui/material';
+import {AppBar, Button, Link, Toolbar, Typography} from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmarks';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Logout';
@@ -28,9 +28,7 @@ export default class MenuBar extends Component {
             <AppBar>
                 <Toolbar>
                     <BookmarkIcon size="large" sx={{mr: 2}}/>
-                    <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
-                        BookmarkManager
-                    </Typography>
+                    <Typography variant="h6" component="div" sx={{flexGrow: 1}}>BookmarkManager</Typography>
                     {button}
                 </Toolbar>
             </AppBar>
