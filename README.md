@@ -111,7 +111,7 @@ You need to have an installation of NodeJS (with npm) and Go. I used NodeJS 16 a
 - [ ] Create browser extensions/bookmarklets
 - [x] Implement bookmark creation using the frontend
 - [ ] Add per user bookmarks/registration
-- [ ] Create Android and iOS apps
+- [x] Create Android and iOS apps
 - [ ] Multi-language Support
     - [ ] German
 
