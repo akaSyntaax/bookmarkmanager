@@ -6,7 +6,7 @@ import (
 )
 
 type Bookmark struct {
-	ID      int64       `json:"id"`
+	ID      uint32      `json:"id"`
 	Title   null.String `json:"title" validate:"min=1,max=64"`
 	URL     string      `json:"url" validate:"required,max=256,url"`
 	Created time.Time   `json:"created"`

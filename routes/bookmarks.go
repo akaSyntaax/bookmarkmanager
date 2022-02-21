@@ -31,7 +31,7 @@ func FetchBookmarks() ([]models.Bookmark, error) {
 	return bookmarks, nil
 }
 
-func FetchBookmark(id int64) (models.Bookmark, error) {
+func FetchBookmark(id uint32) (models.Bookmark, error) {
 	var bookmark models.Bookmark
 
 	row := DBClient.QueryRow("SELECT * FROM Bookmarks WHERE ID = ? LIMIT 1", id)
@@ -55,8 +55,8 @@ func GetBookmarks(c *gin.Context) {
 }
 
 func DeleteBookmarks(c *gin.Context) {
-	var bookmarksToDelete []int64
-	deletedBookmarks := []int64{}
+	var bookmarksToDelete []uint32
+	deletedBookmarks := []uint32{}
 
 	if err := c.BindJSON(&bookmarksToDelete); err != nil {
 		HandleError(http.StatusBadRequest, err, c)
@@ -88,9 +88,9 @@ func DeleteBookmarks(c *gin.Context) {
 }
 
 func UpdateBookmark(c *gin.Context) {
-	targetBookmarkID, converr := strconv.Atoi(c.Param("id"))
+	targetBookmarkID, converr := strconv.ParseUint(c.Param("id"), 10, 32)
 
-	if converr != nil {
+	if converr != nil || targetBookmarkID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid bookmark id"})
 		return
 	}
@@ -110,7 +110,7 @@ func UpdateBookmark(c *gin.Context) {
 		return
 	}
 
-	targetBookmark, fetcherr := FetchBookmark(int64(targetBookmarkID))
+	targetBookmark, fetcherr := FetchBookmark(uint32(targetBookmarkID))
 
 	if fetcherr != nil {
 		HandleError(http.StatusInternalServerError, fetcherr, c)
@@ -122,6 +122,9 @@ func UpdateBookmark(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Bookmark does not exist"})
 		return
 	}
+
+	updatedBookmark.ID = uint32(targetBookmarkID)
+	updatedBookmark.Created = targetBookmark.Created
 
 	result, err := DBClient.Exec("UPDATE Bookmarks SET Title = ?, URL = ? WHERE ID = ?", updatedBookmark.Title, updatedBookmark.URL, targetBookmarkID)
 
@@ -139,7 +142,7 @@ func UpdateBookmark(c *gin.Context) {
 	}
 }
 
-func contains(s []int64, e int64) bool {
+func contains(s []uint32, e uint32) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -176,7 +179,7 @@ func PostBookmark(c *gin.Context) {
 	rowsAffected, _ := result.RowsAffected()
 
 	if rowsAffected > 0 {
-		newBookmark, err := FetchBookmark(insertedID)
+		newBookmark, err := FetchBookmark(uint32(insertedID))
 
 		if err != nil {
 			HandleError(http.StatusInternalServerError, err, c)
