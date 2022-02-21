@@ -24,11 +24,8 @@ export default class AddBookmarkDialog extends Component {
     };
 
     handleSave = async () => {
-        let success = await this.props.handleSave(this.state.url, this.state.title)
-
-        if (success) {
-            this.setState({url: "", title: ""})
-        }
+        this.props.handleSave(this.state.url, this.state.title)
+        this.setState({url: "", title: ""})
     };
 
     render() {
