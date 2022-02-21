@@ -14,8 +14,7 @@ export default class LoginRoute extends Component {
             loginPending: false,
             errorSnackbarText: '',
             errorSnackbarVisible: false,
-            errorSnackbarSeverity: 'error',
-            loginSucceeded: false
+            errorSnackbarSeverity: 'error'
         };
     }
 

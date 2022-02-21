@@ -12,12 +12,11 @@ export default class App extends Component {
     render() {
         return (
             <>
-                <MenuBar/>
                 <Container style={{marginTop: '90px'}}>
                     <Routes>
-                        <Route path="/" element={<AuthenticatedRoute><MainRoute/></AuthenticatedRoute>}/>
-                        <Route path="/login" element={<UnauthenticatedRoute><LoginRoute/></UnauthenticatedRoute>}/>
-                        <Route path="/register" element={<UnauthenticatedRoute><RegisterRoute/></UnauthenticatedRoute>}/>
+                        <Route path="/" element={<AuthenticatedRoute><MenuBar/><MainRoute/></AuthenticatedRoute>}/>
+                        <Route path="/login" element={<UnauthenticatedRoute><MenuBar route="login"/><LoginRoute/></UnauthenticatedRoute>}/>
+                        <Route path="/register" element={<UnauthenticatedRoute><MenuBar route="register"/><RegisterRoute/></UnauthenticatedRoute>}/>
                     </Routes>
                 </Container>
             </>

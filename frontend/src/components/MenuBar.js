@@ -17,11 +17,9 @@ export default class MenuBar extends Component {
         if (localStorage.getItem("bearerToken") !== null) {
             button = <Button startIcon={<LogoutIcon/>} color="inherit" onClick={this.handleLogout}>Logout</Button>;
         } else {
-            let splittedPath = window.location.href.split('/');
-
-            if (splittedPath[splittedPath.length - 1] === 'login') {
+            if (this.props.route === 'login') {
                 button = <Button startIcon={<AccountCirlceIcon/>} color="inherit" onClick={() => window.location.href = '/register'}>Register</Button>;
-            } else if (splittedPath[splittedPath.length - 1] === 'register') {
+            } else if (this.props.route === 'register') {
                 button = <Button startIcon={<LoginIcon/>} color="inherit" onClick={() => window.location.href = '/login'}>Login</Button>;
             }
         }

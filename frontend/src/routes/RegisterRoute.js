@@ -14,8 +14,7 @@ export default class RegisterRoute extends Component {
             registrationPending: false,
             errorSnackbarText: '',
             errorSnackbarVisible: false,
-            errorSnackbarSeverity: 'error',
-            loginSucceeded: false
+            errorSnackbarSeverity: 'error'
         };
     }
 
@@ -47,7 +46,7 @@ export default class RegisterRoute extends Component {
                 errorSnackbarText: 'Registration failed: ' + error.response.data.error,
                 errorSnackbarVisible: true,
                 errorSnackbarSeverity: 'error',
-                loginPending: false
+                registrationPending: false
             });
         });
     };
