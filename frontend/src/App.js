@@ -19,7 +19,7 @@ export default class App extends Component {
                 {
                     field: 'title',
                     headerName: 'Title',
-                    width: '250',
+                    flex: 1,
                     editable: true,
                     renderCell: (params) => {
                         return (
@@ -33,7 +33,7 @@ export default class App extends Component {
                 {
                     field: 'url',
                     headerName: 'URL',
-                    width: '250',
+                    flex: 4,
                     editable: true,
                     renderCell: (params) => <Link underline="none" target="_blank" href={params.row.url}>{params.row.url}</Link>
                 },
