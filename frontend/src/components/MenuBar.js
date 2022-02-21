@@ -1,5 +1,5 @@
 import {Component} from 'react';
-import {AppBar, Button, Link, Toolbar, Typography} from '@mui/material';
+import {AppBar, Button, Toolbar, Typography} from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmarks';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Logout';
