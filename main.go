@@ -59,6 +59,9 @@ func main() {
 		}
 
 		api.Use(JWTAuthMiddleware())
+
+		api.POST("/users/password", routes.ChangePassword)
+
 		api.GET("/diagnostics", routes.GetDiagnostics)
 		api.GET("/bookmarks", routes.GetBookmarks)
 		api.POST("/bookmarks", routes.PostBookmark)

@@ -105,11 +105,8 @@ func UpdateBookmark(c *gin.Context) {
 		return
 	}
 
-	validate := validator.New()
-	validationErr := validate.Struct(updatedBookmark)
-
-	if validationErr != nil {
-		HandleError(http.StatusBadRequest, validationErr, c)
+	if err := validator.New().Struct(updatedBookmark); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
 		return
 	}
 
@@ -165,11 +162,8 @@ func PostBookmark(c *gin.Context) {
 		return
 	}
 
-	validate := validator.New()
-	validationErr := validate.Struct(bookmark)
-
-	if validationErr != nil {
-		HandleError(http.StatusBadRequest, validationErr, c)
+	if err := validator.New().Struct(bookmark); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
 		return
 	}
 

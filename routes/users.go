@@ -21,11 +21,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	validate := validator.New()
-	validationErr := validate.Struct(loginPayload)
-
-	if validationErr != nil {
-		HandleError(http.StatusBadRequest, validationErr, c)
+	if err := validator.New().Struct(loginPayload); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
 		return
 	}
 
@@ -96,11 +93,8 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	validate := validator.New()
-	validationErr := validate.Struct(registrationPayload)
-
-	if validationErr != nil {
-		HandleError(http.StatusBadRequest, validationErr, c)
+	if err := validator.New().Struct(registrationPayload); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
 		return
 	}
 
@@ -136,6 +130,41 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"success": true})
 	} else {
 		HandleError(http.StatusNotModified, errors.New("user could not be created"), c)
+	}
+}
+
+func ChangePassword(c *gin.Context) {
+	var passwordPayload models.PasswordPayload
+	user, _ := c.Get("user")
+
+	if err := c.BindJSON(&passwordPayload); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
+		return
+	}
+
+	if err := validator.New().Struct(passwordPayload); err != nil {
+		HandleError(http.StatusBadRequest, err, c)
+		return
+	}
+
+	hash, hashErr := HashPassword(passwordPayload.Password)
+
+	if hashErr != nil {
+		HandleError(http.StatusInternalServerError, hashErr, c)
+		return
+	}
+
+	result, err := DBClient.Exec("UPDATE Users SET PasswordHash = ? WHERE ID = ?", hash, user.(models.User).ID)
+
+	if err != nil {
+		HandleError(http.StatusInternalServerError, err, c)
+		return
+	}
+
+	if rowsAffected, _ := result.RowsAffected(); rowsAffected > 0 {
+		c.JSON(http.StatusOK, gin.H{"success": true})
+	} else {
+		HandleError(http.StatusNotModified, errors.New("password could not be updated"), c)
 	}
 }
 
