@@ -1,37 +1,106 @@
-import {Component} from 'react';
-import {AppBar, Button, Toolbar, Typography} from '@mui/material';
-import BookmarkIcon from '@mui/icons-material/Bookmarks';
-import LogoutIcon from '@mui/icons-material/Logout';
-import LoginIcon from '@mui/icons-material/Logout';
-import AccountCirlceIcon from '@mui/icons-material/AccountCircle';
+import React from 'react';
+import {AppBar, Avatar, Button, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Typography} from '@mui/material';
+import {AccountCircle, Bookmarks, Login, Logout, Password} from '@mui/icons-material';
 
-export default class MenuBar extends Component {
-    handleLogout = () => {
-        localStorage.removeItem("bearerToken");
+function parseJwt (token) {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+export default function MenuBar(props) {
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const handleMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleLogout = () => {
+        handleClose();
+        localStorage.removeItem('bearerToken');
         window.location.reload();
     };
 
-    render() {
-        let button = <></>;
+    let userMenu = <></>;
 
-        if (localStorage.getItem("bearerToken") !== null) {
-            button = <Button startIcon={<LogoutIcon/>} color="inherit" onClick={this.handleLogout}>Logout</Button>;
-        } else {
-            if (this.props.route === 'login') {
-                button = <Button startIcon={<AccountCirlceIcon/>} color="inherit" onClick={() => window.location.href = '/register'}>Register</Button>;
-            } else if (this.props.route === 'register') {
-                button = <Button startIcon={<LoginIcon/>} color="inherit" onClick={() => window.location.href = '/login'}>Login</Button>;
-            }
+    if (localStorage.getItem('bearerToken') !== null) {
+        let claims = parseJwt(localStorage.getItem("bearerToken"));
+
+        userMenu =
+            <>
+                <IconButton size="large" aria-label="account of current user" aria-controls="menu-appbar" aria-haspopup="true" color="inherit"
+                            onClick={handleMenu}>
+                    <AccountCircle/>
+                </IconButton>
+                <Menu id="menu-appbar" anchorEl={anchorEl} anchorOrigin={{vertical: 'top', horizontal: 'right'}} keepMounted
+                      transformOrigin={{vertical: 'top', horizontal: 'right'}} open={Boolean(anchorEl)} onClose={handleClose}
+                      PaperProps={{
+                          elevation: 0,
+                          sx: {
+                              overflow: 'visible',
+                              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                              mt: 1.5,
+                              '& .MuiAvatar-root': {
+                                  width: 32,
+                                  height: 32,
+                                  ml: -0.5,
+                                  mr: 1,
+                              },
+                              '&:before': {
+                                  content: '""',
+                                  display: 'block',
+                                  position: 'absolute',
+                                  top: 0,
+                                  right: 14,
+                                  width: 10,
+                                  height: 10,
+                                  bgcolor: 'background.paper',
+                                  transform: 'translateY(-50%) rotate(45deg)',
+                                  zIndex: 0,
+                              },
+                          },
+                      }}>
+                    <MenuItem>
+                        <Avatar/> {claims.sub}
+                    </MenuItem>
+                    <Divider/>
+                    <MenuItem>
+                        <ListItemIcon>
+                            <Password fontSize="small"/>
+                        </ListItemIcon>
+                        <ListItemText>Change password</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>
+                        <ListItemIcon>
+                            <Logout fontSize="small"/>
+                        </ListItemIcon>
+                        <ListItemText>Logout</ListItemText>
+                    </MenuItem>
+                </Menu>
+            </>;
+    } else {
+        if (props.route === 'login') {
+            userMenu = <Button startIcon={<AccountCircle/>} color="inherit" onClick={() => window.location.href = '/register'}>Register</Button>;
+        } else if (props.route === 'register') {
+            userMenu = <Button startIcon={<Login/>} color="inherit" onClick={() => window.location.href = '/login'}>Login</Button>;
         }
-
-        return (
-            <AppBar>
-                <Toolbar>
-                    <BookmarkIcon size="large" sx={{mr: 2}}/>
-                    <Typography variant="h6" component="div" sx={{flexGrow: 1}}>BookmarkManager</Typography>
-                    {button}
-                </Toolbar>
-            </AppBar>
-        );
     }
+
+    return (
+        <AppBar>
+            <Toolbar>
+                <Bookmarks size="large" sx={{mr: 2}}/>
+                <Typography variant="h6" component="div" sx={{flexGrow: 1}}>BookmarkManager</Typography>
+                {userMenu}
+            </Toolbar>
+        </AppBar>
+    );
 }
