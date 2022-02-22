@@ -29,13 +29,20 @@ export default function AddBookmarkDialog(props) {
         });
     };
 
+    const handleKeyPress = e => {
+        if (e.which === 13) {
+            handleSubmit();
+        }
+    };
+
     return (
         <Dialog open={props.dialogOpen} onClose={props.handleClose}>
             <DialogTitle>Add bookmark</DialogTitle>
             <DialogContent>
                 <DialogContentText>Please fill in the url and optionally a title, then click "Save" to save the bookmark</DialogContentText>
                 <TextField autoFocus margin="dense" label="URL" type="url" fullWidth variant="standard" onChange={e => setURL(e.target.value)} value={url}/>
-                <TextField margin="dense" label="Title" type="text" fullWidth variant="standard" onChange={e => setTitle(e.target.value)} value={title}/>
+                <TextField margin="dense" label="Title" type="text" fullWidth variant="standard" onChange={e => setTitle(e.target.value)} value={title}
+                           onKeyPress={handleKeyPress}/>
             </DialogContent>
             <DialogActions>
                 <Button onClick={props.handleClose}>Cancel</Button>
