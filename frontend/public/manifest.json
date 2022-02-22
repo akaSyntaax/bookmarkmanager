@@ -1,6 +1,6 @@
 {
-  "short_name": "Bookmark Manager",
-  "name": "Bookmark Manager Frontend",
+  "short_name": "BookmarkManager",
+  "name": "BookmarkManager",
   "icons": [
     {
       "src": "favicon.ico",
