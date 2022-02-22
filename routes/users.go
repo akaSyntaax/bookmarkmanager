@@ -78,6 +78,10 @@ func ValidateToken(tokenString string) (*authCustomClaims, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	if claims, ok := token.Claims.(*authCustomClaims); ok && token.Valid {
 		return claims, nil
 	} else {
