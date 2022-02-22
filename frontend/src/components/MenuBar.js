@@ -1,11 +1,13 @@
 import React from 'react';
 import {AppBar, Avatar, Button, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Toolbar, Typography} from '@mui/material';
 import {AccountCircle, Bookmarks, Login, Logout, Password} from '@mui/icons-material';
+import ChangePasswordDialog from './ChangePasswordDialog';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 
-function parseJwt (token) {
+function parseJwt(token) {
     let base64Url = token.split('.')[1];
     let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 
@@ -14,6 +16,8 @@ function parseJwt (token) {
 
 export default function MenuBar(props) {
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [changePasswordDialogOpen, setChangePasswordDialogOpen] = React.useState(false);
+    const navigate = useNavigate();
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -26,13 +30,13 @@ export default function MenuBar(props) {
     const handleLogout = () => {
         handleClose();
         localStorage.removeItem('bearerToken');
-        window.location.reload();
+        navigate('/login');
     };
 
     let userMenu = <></>;
 
     if (localStorage.getItem('bearerToken') !== null) {
-        let claims = parseJwt(localStorage.getItem("bearerToken"));
+        let claims = parseJwt(localStorage.getItem('bearerToken'));
 
         userMenu =
             <>
@@ -59,7 +63,7 @@ export default function MenuBar(props) {
                                   display: 'block',
                                   position: 'absolute',
                                   top: 0,
-                                  right: 14,
+                                  right: 19,
                                   width: 10,
                                   height: 10,
                                   bgcolor: 'background.paper',
@@ -72,7 +76,7 @@ export default function MenuBar(props) {
                         <Avatar/> {claims.sub}
                     </MenuItem>
                     <Divider/>
-                    <MenuItem>
+                    <MenuItem onClick={() => {handleClose();setChangePasswordDialogOpen(true);}}>
                         <ListItemIcon>
                             <Password fontSize="small"/>
                         </ListItemIcon>
@@ -85,12 +89,14 @@ export default function MenuBar(props) {
                         <ListItemText>Logout</ListItemText>
                     </MenuItem>
                 </Menu>
+                <ChangePasswordDialog dialogOpen={changePasswordDialogOpen} handleClose={() => setChangePasswordDialogOpen(false)}
+                                      displayError={props.displayError} displaySuccess={props.displaySuccess} axiosHeaders={props.axiosHeaders}/>
             </>;
     } else {
         if (props.route === 'login') {
-            userMenu = <Button startIcon={<AccountCircle/>} color="inherit" onClick={() => window.location.href = '/register'}>Register</Button>;
+            userMenu = <Button startIcon={<AccountCircle/>} color="inherit" component={RouterLink} to="/register">Register</Button>;
         } else if (props.route === 'register') {
-            userMenu = <Button startIcon={<Login/>} color="inherit" onClick={() => window.location.href = '/login'}>Login</Button>;
+            userMenu = <Button startIcon={<Login/>} color="inherit"  component={RouterLink} to="/login">Login</Button>;
         }
     }
 
