@@ -74,7 +74,7 @@ export default function MenuBar(props) {
                           },
                       }}>
                     <MenuItem>
-                        <Avatar/> {claims.sub}
+                        <Avatar sx={{bgcolor: '#3179d2'}}>{claims.sub.charAt(0)}</Avatar> {claims.sub}
                     </MenuItem>
                     <Divider/>
                     <MenuItem onClick={() => {handleClose();setChangePasswordDialogOpen(true);}}>
