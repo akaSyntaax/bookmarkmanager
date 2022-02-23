@@ -69,10 +69,20 @@ export default class MainRoute extends Component {
                 data: this.state.selectedRows
             }).then(() => {
                 this.reloadDataGrid();
-                this.props.displaySuccess('The bookmarks have been deleted');
+
+                if (this.state.selectedRows.length > 1) {
+                    this.props.displaySuccess('The selected bookmarks have been deleted');
+                } else {
+                    this.props.displaySuccess('The selected bookmark has been deleted');
+                }
             }).catch(error => {
                 console.error(error, error.response);
-                this.props.displayError('An error occurred while deleting the bookmarks: ' + error.response.data.error);
+
+                if (this.state.selectedRows.length > 1) {
+                    this.props.displayError('An error occurred while deleting the selected bookmarks: ' + error.response.data.error);
+                } else {
+                    this.props.displayError('An error occurred while deleting the bookmark: ' + error.response.data.error);
+                }
             }).finally(() => {
                 this.setState({deletePending: false});
             });
