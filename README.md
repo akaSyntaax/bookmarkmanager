@@ -87,10 +87,10 @@ You need to have an installation of NodeJS (with npm) and Go. I used NodeJS 16 a
 ### Steps to start developing
 
 1. Clone the repository
-2. Install the frontend dependencies by running `npm install` in the folder `frontend`
+2. Install the frontend dependencies by running `yarn install` in the folder `frontend`
 3. Open the folder with your favorite editor or ide
 4. Make your changes to the code
-5. To compile the frontend, cd into the folder `frontend` and run `npm run build`
+5. To compile the frontend, cd into the folder `frontend` and run `yarn run build`
 6. After building the frontend, you can build the backend by running `go build .` in the projects root folder
 
 ### Building the docker image

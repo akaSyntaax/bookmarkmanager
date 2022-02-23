@@ -11,6 +11,7 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"path"
@@ -67,6 +68,11 @@ func main() {
 		api.POST("/bookmarks", routes.PostBookmark)
 		api.DELETE("/bookmarks", routes.DeleteBookmarks)
 		api.PATCH("/bookmarks/:id", routes.UpdateBookmark)
+	}
+
+	// Required for es-modules to work
+	if err := mime.AddExtensionType(".js", "text/javascript"); err != nil {
+		log.Fatal("Could not setup mime types: " + err.Error())
 	}
 
 	router.Use(ServeEmbedFS("frontend/build", reactStatic))
