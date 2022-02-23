@@ -36,7 +36,7 @@ export default function AddBookmarkDialog(props) {
     };
 
     return (
-        <Dialog open={props.dialogOpen} onClose={props.handleClose}>
+        <Dialog open={props.dialogOpen} onClose={() => {if (!addPending) props.handleClose()}}>
             <DialogTitle>Add bookmark</DialogTitle>
             <DialogContent>
                 <DialogContentText>Please fill in the url and optionally a title, then click "Save" to save the bookmark</DialogContentText>
@@ -45,7 +45,7 @@ export default function AddBookmarkDialog(props) {
                            onKeyPress={handleKeyPress}/>
             </DialogContent>
             <DialogActions>
-                <Button onClick={props.handleClose}>Cancel</Button>
+                <Button disabled={addPending} onClick={props.handleClose}>Cancel</Button>
                 <LoadingButton loading={addPending} onClick={handleSubmit}>Save</LoadingButton>
             </DialogActions>
         </Dialog>

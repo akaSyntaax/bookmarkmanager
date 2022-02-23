@@ -30,6 +30,7 @@ export default function MenuBar(props) {
     const handleLogout = () => {
         handleClose();
         localStorage.removeItem('bearerToken');
+        props.displaySuccess("You have been logged out");
         navigate('/login');
     };
 
