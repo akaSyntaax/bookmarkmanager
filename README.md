@@ -63,6 +63,7 @@ I publish binaries for several operating systems and architectures on the [relea
 2. Unpack the archive to your preferred location
 3. Create a file named `.env` in the same folder the binary is located and paste in the following:
 ```
+LISTEN=0.0.0.0
 PORT=8000
 DB_PATH=./database.sqlite3
 TRUSTED_PROXIES=127.0.0.1,::1
