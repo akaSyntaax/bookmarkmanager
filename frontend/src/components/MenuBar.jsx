@@ -3,6 +3,7 @@ import {AppBar, Avatar, Button, Divider, IconButton, ListItemIcon, ListItemText,
 import {AccountCircle, Bookmarks, Login, Logout, Password} from '@mui/icons-material';
 import ChangePasswordDialog from './ChangePasswordDialog';
 import {Link as RouterLink, useNavigate} from 'react-router-dom';
+import DiagnosticsDialog from './DiagnosticsDialog';
 
 function parseJwt(token) {
     let base64Url = token.split('.')[1];
@@ -17,6 +18,7 @@ function parseJwt(token) {
 export default function MenuBar(props) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [changePasswordDialogOpen, setChangePasswordDialogOpen] = React.useState(false);
+    const [diagnosticsDialogOpen, setDiagnosticsDialogOpen] = React.useState(false);
     const navigate = useNavigate();
 
     const handleMenu = (event) => {
@@ -73,7 +75,7 @@ export default function MenuBar(props) {
                               },
                           },
                       }}>
-                    <MenuItem>
+                    <MenuItem onDoubleClick={() => {handleClose();setDiagnosticsDialogOpen(true)}}>
                         <Avatar sx={{bgcolor: '#3179d2'}}>{claims.sub.charAt(0)}</Avatar> {claims.sub}
                     </MenuItem>
                     <Divider/>
@@ -91,6 +93,8 @@ export default function MenuBar(props) {
                     </MenuItem>
                 </Menu>
                 <ChangePasswordDialog dialogOpen={changePasswordDialogOpen} handleClose={() => setChangePasswordDialogOpen(false)}
+                                      displayError={props.displayError} displaySuccess={props.displaySuccess} requestHeaders={props.requestHeaders}/>
+                <DiagnosticsDialog dialogOpen={diagnosticsDialogOpen} handleClose={() => setDiagnosticsDialogOpen(false)}
                                       displayError={props.displayError} displaySuccess={props.displaySuccess} requestHeaders={props.requestHeaders}/>
             </>;
     } else {

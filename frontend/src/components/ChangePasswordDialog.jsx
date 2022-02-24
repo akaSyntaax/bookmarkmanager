@@ -41,17 +41,19 @@ export default function ChangePasswordDialog(props) {
         }
     };
 
-    return (<Dialog open={props.dialogOpen} onClose={() => {if (!changePending) props.handleClose()}}>
-        <DialogTitle>Change password</DialogTitle>
-        <DialogContent>
-            <TextField autoFocus margin="dense" label="New password" type="password" fullWidth variant="standard"
-                       onChange={e => setPassword(e.target.value)} value={password}/>
-            <TextField margin="dense" label="Repeat the new password" type="password" fullWidth variant="standard"
-                       onChange={e => setRepeatPassword(e.target.value)} value={repeatPassword} onKeyPress={handleKeyPress}/>
-        </DialogContent>
-        <DialogActions>
-            <Button disabled={changePending} onClick={props.handleClose}>Cancel</Button>
-            <LoadingButton loading={changePending} onClick={handleSubmit}>Change password</LoadingButton>
-        </DialogActions>
-    </Dialog>);
+    return (
+        <Dialog open={props.dialogOpen} onClose={() => {if (!changePending) props.handleClose();}}>
+            <DialogTitle>Change password</DialogTitle>
+            <DialogContent>
+                <TextField autoFocus margin="dense" label="New password" type="password" fullWidth variant="standard"
+                           onChange={e => setPassword(e.target.value)} value={password}/>
+                <TextField margin="dense" label="Repeat the new password" type="password" fullWidth variant="standard"
+                           onChange={e => setRepeatPassword(e.target.value)} value={repeatPassword} onKeyPress={handleKeyPress}/>
+            </DialogContent>
+            <DialogActions>
+                <Button disabled={changePending} onClick={props.handleClose}>Cancel</Button>
+                <LoadingButton loading={changePending} onClick={handleSubmit}>Change password</LoadingButton>
+            </DialogActions>
+        </Dialog>
+    );
 }
