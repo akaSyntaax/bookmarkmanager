@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	"io"
@@ -40,6 +41,7 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(cors.Default())
 	router.Use(gin.Recovery())
+	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	err := router.SetTrustedProxies(strings.Split(os.Getenv("TRUSTED_PROXIES"), ","))
 
