@@ -2,7 +2,8 @@ import React from 'react';
 import {Avatar, Box, Container, TextField, Typography} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoadingButton from '@mui/lab/LoadingButton';
-import axios from 'axios';
+import ky from 'ky';
+import {extractErrorMessage} from '../utils/ErrorUtil';
 
 export default function LoginRoute(props) {
     const [username, setUsername] = React.useState('');
@@ -16,16 +17,16 @@ export default function LoginRoute(props) {
 
         setLoginPending(true);
 
-        axios.post('/api/users/login', {username, password}).then(response => {
-            if (response.data.success === true) {
-                localStorage.setItem('bearerToken', response.data.token);
+        ky.post('/api/users/login', {json: {username, password}}).json().then(response => {
+            if (response.success === true) {
+                localStorage.setItem('bearerToken', response.token);
 
                 // Causes re-rendering and therefore a manual redirect/reload is not needed
                 props.displaySuccess('Login successful');
             }
-        }).catch(error => {
+        }).catch(async error => {
             console.log(error, error.response);
-            props.displayError('Login failed: ' + error.response.data.error);
+            props.displayError('Login failed: ' + await extractErrorMessage(error));
             setLoginPending(false);
         });
     };

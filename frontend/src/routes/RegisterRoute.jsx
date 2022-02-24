@@ -2,8 +2,9 @@ import React from 'react';
 import {Avatar, Box, Container, TextField, Typography} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoadingButton from '@mui/lab/LoadingButton';
-import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
+import {extractErrorMessage} from '../utils/ErrorUtil';
+import ky from 'ky';
 
 export default function RegisterRoute(props) {
     const [username, setUsername] = React.useState('');
@@ -18,14 +19,14 @@ export default function RegisterRoute(props) {
 
         setRegistrationPending(true);
 
-        axios.post('/api/users/register', {username, password}).then(response => {
-            if (response.data.success === true) {
+        ky.post('/api/users/register', {json: {username, password}}).json().then(response => {
+            if (response.success === true) {
                 props.displaySuccess('Your account has been created. You may now log in');
                 navigate('/login');
             }
-        }).catch(error => {
+        }).catch(async error => {
             console.log(error, error.response);
-            props.displayError('Registration failed: ' + error.response.data.error);
+            props.displayError('Registration failed: ' + await extractErrorMessage(error));
             setRegistrationPending(false);
         });
     };
