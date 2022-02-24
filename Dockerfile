@@ -2,7 +2,7 @@
 FROM node:16-alpine AS node-builder
 WORKDIR /src/
 COPY ./frontend/ /src/
-RUN yarn install --immutable --immutable-cache --check-cache
+RUN yarn install --immutable --immutable-cache --check-cache --network-timeout=100000
 RUN yarn run build
 
 FROM golang:1.17 AS go-builder
