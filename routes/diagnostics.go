@@ -8,7 +8,7 @@ import (
 )
 
 func GetDiagnostics(c *gin.Context) {
-	dbVersion, err := ExecuteStringQuery("SELECT VERSION()")
+	dbVersion, err := ExecuteStringQuery("SELECT sqlite_version()")
 
 	if err != nil {
 		HandleError(http.StatusInternalServerError, err, c)
