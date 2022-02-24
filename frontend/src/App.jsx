@@ -26,7 +26,7 @@ export default function App() {
         setSnackbarVisible(true);
     };
 
-    const buildAxiosHeaders = () => {
+    const buildRequestHeaders = () => {
         return {Authorization: 'Bearer ' + localStorage.getItem('bearerToken')};
     };
 
@@ -42,8 +42,8 @@ export default function App() {
                     }/>
                     <Route path="/" element={
                         <AuthenticatedRoute>
-                            <MenuBar displaySuccess={displaySuccess} displayError={displayError} axiosHeaders={buildAxiosHeaders()}/>
-                            <MainRoute displaySuccess={displaySuccess} displayError={displayError} axiosHeaders={buildAxiosHeaders()}/>
+                            <MenuBar displaySuccess={displaySuccess} displayError={displayError} requestHeaders={buildRequestHeaders()}/>
+                            <MainRoute displaySuccess={displaySuccess} displayError={displayError} requestHeaders={buildRequestHeaders()}/>
                         </AuthenticatedRoute>
                     }/>
                     <Route path="/login" element={

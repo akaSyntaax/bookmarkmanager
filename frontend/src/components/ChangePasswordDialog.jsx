@@ -1,7 +1,8 @@
 import React from 'react';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from '@mui/material';
-import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
+import ky from 'ky';
+import {extractErrorMessage} from '../utils/ErrorUtil';
 
 export default function ChangePasswordDialog(props) {
     const [password, setPassword] = React.useState('');
@@ -21,14 +22,14 @@ export default function ChangePasswordDialog(props) {
 
         setChangePending(true);
 
-        axios.post('/api/users/password', {password}, {headers: props.axiosHeaders}).then(() => {
+        ky.post('/api/users/password', {headers: props.requestHeaders, json: {password}}).then(() => {
             setPassword('');
             setRepeatPassword('');
             props.handleClose();
             props.displaySuccess('The password has been changed');
-        }).catch(error => {
+        }).catch(async error => {
             console.error(error, error.response);
-            props.displayError('Error while changing password: ' + error.response.data.error);
+            props.displayError('Error while changing password: ' + await extractErrorMessage(error));
         }).finally(() => {
             setChangePending(false);
         });

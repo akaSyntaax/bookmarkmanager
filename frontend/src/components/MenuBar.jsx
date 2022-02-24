@@ -91,7 +91,7 @@ export default function MenuBar(props) {
                     </MenuItem>
                 </Menu>
                 <ChangePasswordDialog dialogOpen={changePasswordDialogOpen} handleClose={() => setChangePasswordDialogOpen(false)}
-                                      displayError={props.displayError} displaySuccess={props.displaySuccess} axiosHeaders={props.axiosHeaders}/>
+                                      displayError={props.displayError} displaySuccess={props.displaySuccess} requestHeaders={props.requestHeaders}/>
             </>;
     } else {
         if (props.route === 'login') {

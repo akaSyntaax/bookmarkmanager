@@ -6,7 +6,8 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import AddBookmarkDialog from '../components/AddBookmarkDialog';
-import axios from 'axios';
+import ky from 'ky';
+import {extractErrorMessage} from '../utils/ErrorUtil';
 
 export default class MainRoute extends Component {
     constructor(props) {
@@ -48,13 +49,13 @@ export default class MainRoute extends Component {
     reloadDataGrid = () => {
         this.setState({refreshPending: true});
 
-        axios.get('/api/bookmarks', {
-            headers: this.props.axiosHeaders
-        }).then(response => {
-            this.setState({rows: response.data});
-        }).catch(error => {
+        ky.get('/api/bookmarks', {
+            headers: this.props.requestHeaders
+        }).json().then((data) => {
+            this.setState({rows: data});
+        }).catch(async error => {
             console.error(error, error.response);
-            this.props.displayError('An error occurred while loading the bookmarks: ' + error.response.data.error);
+            this.props.displayError('An error occurred while loading the bookmarks: ' + await extractErrorMessage(error));
         }).finally(() => {
             this.setState({refreshPending: false});
         });
@@ -64,9 +65,9 @@ export default class MainRoute extends Component {
         if (this.state.selectedRows.length > 0) {
             this.setState({deletePending: true});
 
-            axios.delete('/api/bookmarks', {
-                headers: this.props.axiosHeaders,
-                data: this.state.selectedRows
+            ky.delete('/api/bookmarks', {
+                headers: this.props.requestHeaders,
+                json: this.state.selectedRows
             }).then(() => {
                 this.reloadDataGrid();
 
@@ -75,13 +76,13 @@ export default class MainRoute extends Component {
                 } else {
                     this.props.displaySuccess('The selected bookmark has been deleted');
                 }
-            }).catch(error => {
+            }).catch(async error => {
                 console.error(error, error.response);
 
                 if (this.state.selectedRows.length > 1) {
-                    this.props.displayError('An error occurred while deleting the selected bookmarks: ' + error.response.data.error);
+                    this.props.displayError('An error occurred while deleting the selected bookmarks: ' + await extractErrorMessage(error));
                 } else {
-                    this.props.displayError('An error occurred while deleting the bookmark: ' + error.response.data.error);
+                    this.props.displayError('An error occurred while deleting the bookmark: ' + await extractErrorMessage(error));
                 }
             }).finally(() => {
                 this.setState({deletePending: false});
@@ -100,14 +101,15 @@ export default class MainRoute extends Component {
 
         updatedObject[params.field] = params.value;
 
-        axios.patch('/api/bookmarks/' + updatedObject.id, {
-            title: updatedObject.title,
-            url: updatedObject.url
-        }, {headers: this.props.axiosHeaders}).then(() => {
+        ky.patch('/api/bookmarks/' + updatedObject.id, {
+            headers: this.props.requestHeaders,
+            json: {title: updatedObject.title, url: updatedObject.url}
+        }).then(() => {
             this.props.displaySuccess('The bookmark has been updated');
-        }).catch(error => {
+        }).catch(async error => {
             console.error(error, error.response);
-            this.props.displayError('An error occurred while updating the bookmark: ' + error.response.data.error);
+            this.props.displayError('An error occurred while updating the bookmark: ' + await extractErrorMessage(error));
+            this.reloadDataGrid();
         });
     };
 
@@ -140,8 +142,8 @@ export default class MainRoute extends Component {
                     </Grid>
                 </Grid>
 
-                <AddBookmarkDialog dialogOpen={this.state.addBookmarkDialogOpen} handleClose={(bookmarkAdded = false) => {this.setState({addBookmarkDialogOpen: false}); if (bookmarkAdded) {this.reloadDataGrid();}}}
-                                   displaySuccess={this.props.displaySuccess} displayError={this.props.displayError} axiosHeaders={this.props.axiosHeaders}/>
+                <AddBookmarkDialog dialogOpen={this.state.addBookmarkDialogOpen} handleClose={(bookmarkAdded = false) => {this.setState({addBookmarkDialogOpen: false});if (bookmarkAdded) {this.reloadDataGrid();}}}
+                                   displaySuccess={this.props.displaySuccess} displayError={this.props.displayError} requestHeaders={this.props.requestHeaders}/>
             </>
         );
     }

@@ -1,7 +1,8 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from '@mui/material';
 import React from 'react';
-import axios from 'axios';
 import LoadingButton from '@mui/lab/LoadingButton';
+import ky from 'ky';
+import {extractErrorMessage} from '../utils/ErrorUtil';
 
 export default function AddBookmarkDialog(props) {
     const [url, setURL] = React.useState('');
@@ -16,14 +17,14 @@ export default function AddBookmarkDialog(props) {
 
         setAddPending(true);
 
-        axios.post('/api/bookmarks', {url, title}, {headers: props.axiosHeaders}).then(() => {
+        ky.post('/api/bookmarks', {headers: props.requestHeaders, json: {url, title}}).then(() => {
             setURL('');
             setTitle('');
             props.handleClose(true);
             props.displaySuccess('The bookmark has been added');
-        }).catch(error => {
+        }).catch(async error => {
             console.error(error, error.response);
-            props.displayError('An error occurred while adding the bookmark: ' + error.response.data.error);
+            props.displayError('An error occurred while adding the bookmark: ' + await extractErrorMessage(error));
         }).finally(() => {
             setAddPending(false);
         });
