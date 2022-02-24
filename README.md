@@ -98,7 +98,7 @@ You need to have an installation of NodeJS (with npm) and Go. I used NodeJS 16 a
 
 1. Clone the repository to your preferred location and `cd` into it
 2. Execute `sudo docker build . -t akasyntaax/bookmarkmanager:latest` to build the image
-3. You can then run the image by executing `sudo docker run -d --name bookmarkmanager -v /path/to/your/data/:/data -p 8000:8000 akasyntaax/bookmarkmanager:latest`
+3. You can then run the image by executing `sudo docker run -d --name bookmarkmanager -e JWT_SECRET=Your32CharactersJSONWebTokensKey -v /path/to/your/data/:/data -p 8000:8000 akasyntaax/bookmarkmanager:latest`
 4. The app is now accessible at http://your-ip:8000
 
 <p align="right">(<a href="#top">back to top</a>)</p>
