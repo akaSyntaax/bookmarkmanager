@@ -2,6 +2,7 @@ package main
 
 import (
 	"BookmarkManager/routes"
+	"context"
 	"embed"
 	"errors"
 	"fmt"
@@ -15,16 +16,20 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"os/signal"
 	"path"
 	"strings"
+	"syscall"
+	"time"
 )
 
 //go:embed frontend/build/*
 var reactStatic embed.FS
 
 func main() {
-	fmt.Println("Starting up...")
+	log.Println("Starting up...")
 
+	requireEnvironmentVariable("LISTEN")
 	requireEnvironmentVariable("PORT")
 	requireEnvironmentVariable("JWT_SECRET")
 	requireEnvironmentVariable("TRUSTED_PROXIES")
@@ -81,8 +86,36 @@ func main() {
 
 	routes.InitializeDatabase()
 
-	fmt.Println("Startup completed.")
-	router.Run()
+	server := &http.Server{
+		Addr:    fmt.Sprintf("%v:%v", os.Getenv("LISTEN"), os.Getenv("PORT")),
+		Handler: router,
+	}
+
+	go func() {
+		log.Printf("Listening on http://%v:%v\n", os.Getenv("LISTEN"), os.Getenv("PORT"))
+
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Startup failed: %v\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down server...")
+
+	// Close database connection
+	routes.DBClient.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal("Server shutdown enforced: ", err)
+	}
+
+	log.Println("Shutdown completed")
 }
 
 func requireEnvironmentVariable(key string) {
