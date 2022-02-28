@@ -13,7 +13,7 @@ import {
     TableRow
 } from '@mui/material';
 import ky from 'ky';
-import {extractErrorMessage} from '../utils/ErrorUtil';
+import {handleRequestError} from '../utils/ErrorUtil';
 
 export default function DiagnosticsDialog(props) {
     const [loadPending, setLoadPending] = React.useState(false);
@@ -32,9 +32,8 @@ export default function DiagnosticsDialog(props) {
 
                 setRows(newRows);
             }).catch(async error => {
-                console.error(error, error.response);
                 props.handleClose();
-                props.displayError('Error while fetching diagnostics information: ' + await extractErrorMessage(error));
+                props.displayError('Error while fetching diagnostics information: ' + await handleRequestError(error));
             }).finally(() => {
                 setLoadPending(false);
             });

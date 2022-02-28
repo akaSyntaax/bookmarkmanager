@@ -3,7 +3,7 @@ import {Avatar, Box, Container, TextField, Typography} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoadingButton from '@mui/lab/LoadingButton';
 import ky from 'ky';
-import {extractErrorMessage} from '../utils/ErrorUtil';
+import {handleRequestError} from '../utils/ErrorUtil';
 
 export default function LoginRoute(props) {
     const [username, setUsername] = React.useState('');
@@ -25,8 +25,7 @@ export default function LoginRoute(props) {
                 props.displaySuccess('Login successful');
             }
         }).catch(async error => {
-            console.log(error, error.response);
-            props.displayError('Login failed: ' + await extractErrorMessage(error));
+            props.displayError('Login failed: ' + await handleRequestError(error));
             setLoginPending(false);
         });
     };

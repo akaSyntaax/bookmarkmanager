@@ -3,7 +3,7 @@ import {Avatar, Box, Container, TextField, Typography} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoadingButton from '@mui/lab/LoadingButton';
 import {useNavigate} from 'react-router-dom';
-import {extractErrorMessage} from '../utils/ErrorUtil';
+import {handleRequestError} from '../utils/ErrorUtil';
 import ky from 'ky';
 
 export default function RegisterRoute(props) {
@@ -25,8 +25,7 @@ export default function RegisterRoute(props) {
                 navigate('/login');
             }
         }).catch(async error => {
-            console.log(error, error.response);
-            props.displayError('Registration failed: ' + await extractErrorMessage(error));
+            props.displayError('Registration failed: ' + await handleRequestError(error));
             setRegistrationPending(false);
         });
     };

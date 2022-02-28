@@ -2,7 +2,7 @@ import React from 'react';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import ky from 'ky';
-import {extractErrorMessage} from '../utils/ErrorUtil';
+import {handleRequestError} from '../utils/ErrorUtil';
 
 export default function ChangePasswordDialog(props) {
     const [password, setPassword] = React.useState('');
@@ -28,8 +28,7 @@ export default function ChangePasswordDialog(props) {
             props.handleClose();
             props.displaySuccess('The password has been changed');
         }).catch(async error => {
-            console.error(error, error.response);
-            props.displayError('Error while changing password: ' + await extractErrorMessage(error));
+            props.displayError('Error while changing password: ' + await handleRequestError(error));
         }).finally(() => {
             setChangePending(false);
         });

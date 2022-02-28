@@ -2,7 +2,7 @@ import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogT
 import React from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import ky from 'ky';
-import {extractErrorMessage} from '../utils/ErrorUtil';
+import {handleRequestError} from '../utils/ErrorUtil';
 
 export default function AddBookmarkDialog(props) {
     const [url, setURL] = React.useState('');
@@ -23,8 +23,7 @@ export default function AddBookmarkDialog(props) {
             props.handleClose(true);
             props.displaySuccess('The bookmark has been added');
         }).catch(async error => {
-            console.error(error, error.response);
-            props.displayError('An error occurred while adding the bookmark: ' + await extractErrorMessage(error));
+            props.displayError('An error occurred while adding the bookmark: ' + await handleRequestError(error));
         }).finally(() => {
             setAddPending(false);
         });

@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import AddBookmarkDialog from '../components/AddBookmarkDialog';
 import ky from 'ky';
-import {extractErrorMessage} from '../utils/ErrorUtil';
+import {handleRequestError} from '../utils/ErrorUtil';
 
 export default class MainRoute extends Component {
     constructor(props) {
@@ -54,8 +54,7 @@ export default class MainRoute extends Component {
         }).json().then((data) => {
             this.setState({rows: data});
         }).catch(async error => {
-            console.error(error, error.response);
-            this.props.displayError('An error occurred while loading the bookmarks: ' + await extractErrorMessage(error));
+            this.props.displayError('An error occurred while loading the bookmarks: ' + await handleRequestError(error));
         }).finally(() => {
             this.setState({refreshPending: false});
         });
@@ -77,12 +76,10 @@ export default class MainRoute extends Component {
                     this.props.displaySuccess('The selected bookmark has been deleted');
                 }
             }).catch(async error => {
-                console.error(error, error.response);
-
                 if (this.state.selectedRows.length > 1) {
-                    this.props.displayError('An error occurred while deleting the selected bookmarks: ' + await extractErrorMessage(error));
+                    this.props.displayError('An error occurred while deleting the selected bookmarks: ' + await handleRequestError(error));
                 } else {
-                    this.props.displayError('An error occurred while deleting the bookmark: ' + await extractErrorMessage(error));
+                    this.props.displayError('An error occurred while deleting the bookmark: ' + await handleRequestError(error));
                 }
             }).finally(() => {
                 this.setState({deletePending: false});
@@ -107,8 +104,7 @@ export default class MainRoute extends Component {
         }).then(() => {
             this.props.displaySuccess('The bookmark has been updated');
         }).catch(async error => {
-            console.error(error, error.response);
-            this.props.displayError('An error occurred while updating the bookmark: ' + await extractErrorMessage(error));
+            this.props.displayError('An error occurred while updating the bookmark: ' + await handleRequestError(error));
             this.reloadDataGrid();
         });
     };
